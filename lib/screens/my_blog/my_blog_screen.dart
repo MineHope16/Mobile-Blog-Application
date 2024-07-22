@@ -15,7 +15,7 @@ class MyBlogScreen extends StatefulWidget {
 class _MyBlogScreenState extends State<MyBlogScreen> {
   final user = FirebaseAuth.instance.currentUser!;
   
-  @override
+  @overridead
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
