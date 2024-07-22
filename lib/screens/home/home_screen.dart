@@ -17,66 +17,90 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // final auth = FirebaseAuth.instance;
-
+  final auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Home"),
+        title: Text("Home", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.tealAccent.shade400,
+        elevation: 0,
         actions: [
-          PopupMenuButton(itemBuilder: (context) => [
-            PopupMenuItem(
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => MyBlogScreen()));
-              },
-              child: const Text("My Blogs"),
-            ),
-            PopupMenuItem(
-              onTap: () async {
-                final auth = FirebaseAuth.instance;
+          PopupMenuButton<String>(
+            onSelected: (value) async {
+              if (value == 'my_blogs') {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const MyBlogScreen()));
+              } else if (value == 'logout') {
                 await auth.signOut();
-                Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => const LoginScreen()),(route) => false);
-              },
-              child: const Text('Logout'),)
-          ],),
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                      (route) => false,
+                );
+              }
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem<String>(
+                value: 'my_blogs',
+                child: Text("My Blogs"),
+              ),
+              const PopupMenuItem<String>(
+                value: 'logout',
+                child: Text("Logout"),
+              ),
+            ],
+          ),
         ],
       ),
-      body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('blogs').snapshots(),
-        builder: (context,snapshot){
-          if(snapshot.connectionState == ConnectionState.waiting){
-            return const Center(child: CircularProgressIndicator(),);
-          }
-
-          if (snapshot.hasData && snapshot.data != null){
-            final data = snapshot.data!.docs;
-            List<Blog> blogs = [];
-            for (var element in data){
-              Blog blog = Blog.fromMap(element.data());
-              blogs.add(blog);
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.blueGrey.shade100, Colors.white],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance.collection('blogs').snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
             }
 
-            return ListView(
-              padding: const EdgeInsets.all(15),
-              children: [
-                for (var blog in blogs)
-                  ItemsBlog(blog: blog)
-              ],
-            );
-          }
-          return SizedBox();
-        },
-      ),
+            if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            }
 
+            if (snapshot.hasData && snapshot.data != null) {
+              final data = snapshot.data!.docs;
+              List<Blog> blogs = data.map((doc) => Blog.fromMap(doc.data() as Map<String, dynamic>)).toList();
+
+              return ListView.builder(
+                padding: const EdgeInsets.all(15),
+                itemCount: blogs.length,
+                itemBuilder: (context, index) => Card(
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ItemsBlog(blog: blogs[index]),
+                ),
+              );
+            }
+
+            return const Center(child: Text('No blogs available.', style: TextStyle(color: Colors.black54)));
+          },
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
-        onPressed: (){
+        onPressed: () {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const AddBlogScreen()));
         },
-        child: const Icon(CupertinoIcons.plus),
+        backgroundColor: Colors.tealAccent.shade400,
+        child: const Icon(CupertinoIcons.add, color: Colors.black87),
       ),
-
     );
   }
 }
