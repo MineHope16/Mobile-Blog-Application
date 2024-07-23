@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "781994574109",
+    "project_id": "flutterblogapp-2d6a2",
+    "storage_bucket": "flutterblogapp-2d6a2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:781994574109:android:abf9fc400a6c25c2c621f4",
+        "android_client_info": {
+          "package_name": "com.example.zidioblogapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBaLQ0JDbkfgdeZVtGAkG7MDMiN_qD2gzA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
